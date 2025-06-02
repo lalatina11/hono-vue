@@ -6,17 +6,25 @@
     "dev:server": "tsx watch server/src/index.ts",
     "dev:client": "cd client && npm run dev",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
     "build": "tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.3",
+    "@types/dotenv": "^8.2.3",
     "concurrently": "^9.1.2",
-    "hono": "^4.7.11"
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.44.1",
+    "hono": "^4.7.11",
+    "pg": "^8.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "tsx": "^4.7.1",
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }

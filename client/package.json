@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
+    "@types/dotenv": "^8.2.3",
     "@vueuse/core": "^13.3.0",
     "concurrently": "^9.1.2",
+    "dotenv": "^16.5.0",
     "pinia": "^3.0.1",
     "tailwindcss": "^4.1.8",
     "vue": "^3.5.13",

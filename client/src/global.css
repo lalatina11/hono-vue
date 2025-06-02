@@ -7,10 +7,3 @@ html,
 body {
   @apply m-0 p-0 box-border antialiased scroll-smooth;
 }
-
-html {
-  @apply bg-zinc-200/50 text-zinc-800;
-}
-html.dark {
-  @apply bg-zinc-800 text-zinc-200;
-}

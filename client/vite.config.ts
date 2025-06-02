@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
-
+import * as dotenv from "dotenv"
+dotenv.config()
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -21,8 +22,9 @@ export default defineConfig({
   }, server: {
     proxy: {
       "/api": {
-        target: process.env.VITE_API_KEY || "http:localhost:3000",
-        changeOrigin: true
+        target: process.env.VITE_API_KEY || "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api/, '')
       }
     }
   }

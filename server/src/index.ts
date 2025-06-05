@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import expRouter from "./routers/expeditions.js"
+import adminRouter from './routers/admin.js'
 
 const app = new Hono()
 
@@ -9,6 +10,7 @@ app.get('/', (c) => {
 })
 
 app.route("/api/exp", expRouter)
+app.route("/api/admin", adminRouter)
 
 serve({
   fetch: app.fetch,

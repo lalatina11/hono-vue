@@ -6,6 +6,7 @@ import db from "../db/index.js";
 import { eq } from "drizzle-orm";
 import { compareSync, hashSync } from "bcrypt-ts";
 import jwt, { type JwtPayload } from "jsonwebtoken"
+import { adminRepository } from "../repository/admin.js";
 
 export const adminController = {
     create: async (c: Context) => {
@@ -57,13 +58,8 @@ export const adminController = {
             if (await getCookie(c, "admin_permit")) {
                 deleteCookie(c, "admin_permit")
             }
-            const token = await getCookie(c, "admin_token")
-            if (!token) throw new Error("Token are required!")
-            const verifyToken = jwt.verify(token, process.env.SECRET_KEY || "") as JwtPayload
-            const adminId = verifyToken?.id
-            const existingAdmin = await db.select().from(adminTable).where(eq(adminTable.id, adminId))
-            if (!existingAdmin || !existingAdmin.length) throw new Error("Akun admin tidak dikenali")
-            const { password, ...adminDataWithoutPassword } = existingAdmin[0]
+            const { adminData } = await adminRepository.getAdminByToken(c)
+            const { password, ...adminDataWithoutPassword } = adminData
             return c.json({ message: "OK", data: adminDataWithoutPassword, error: false }, 200)
         } catch (error) {
             return c.json({ message: (error as Error).message, data: null, error: true }, 400)

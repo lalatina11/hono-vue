@@ -4,7 +4,7 @@ import MainLayout from '@/layouts/MainLayout.vue';
 </script>
 
 <template>
-  <MainLayout>
+  <MainLayout title="iExpress | Home">
     <main>
       <h1>Hello world</h1>
     </main>

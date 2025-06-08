@@ -1,5 +1,6 @@
 import { getCookie } from "hono/cookie"
-import jwt, { type JwtPayload } from "jsonwebtoken"
+import * as jwt from "jsonwebtoken"
+import { type JwtPayload } from "jsonwebtoken"
 import db from "../db/index.js"
 import { adminTable } from "../db/schema.js"
 import type { Context } from "hono"

@@ -7,7 +7,7 @@ import NavDropDown from "./NavDropDown.vue";
 <template>
     <header class="flex justify-between items-center p-4 border-b">
         <NavDropDown />
-        <RouterLink class="text-xl font-semibold" to="/">iBlogs</RouterLink>
+        <RouterLink class="text-xl font-semibold" to="/">iExpress</RouterLink>
         <nav class="gap-2 items-center hidden md:flex">
             <RouterLink class="btn btn-link" to="/">Home</RouterLink>
             <RouterLink class="btn btn-link" to="/about">About</RouterLink>

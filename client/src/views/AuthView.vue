@@ -31,20 +31,28 @@
                     <label for="username" class="label">
                         <span class="label-text">Username</span>
                     </label>
-                    <input type="text" placeholder="username" id="username" class="input input-bordered" />
+                    <input type="text" name="username" placeholder="username" id="username"
+                        class="input input-bordered" />
+                </div>
+                <div class="form-control flex flex-col gap-2 w-full">
+                    <label for="name" class="label">
+                        <span class="label-text">Name</span>
+                    </label>
+                    <input type="text" placeholder="name" name="name" id="name" class="input input-bordered" />
                 </div>
                 <div class="form-control flex flex-col gap-2 w-full">
                     <label for="password" class="label">
                         <span class="label-text">Password</span>
                     </label>
-                    <input type="password" placeholder="password" id="password" class="input input-bordered" />
+                    <input type="password" name="password" placeholder="password" id="password"
+                        class="input input-bordered" />
                 </div>
                 <div class="form-control flex gap-2 items-center w-full my-2">
                     <input type="checkbox" onclick="password.type = password.type==='password'?'text':'password'"
                         class="checkbox checkbox-md checkbox-accent" id="showpassword">
                     <label for="showpassword" class="label label-text">Show Password</label>
                 </div>
-                <button class="btn btn-primary w-full my-2">Login</button>
+                <button class="btn btn-primary w-full my-2">Create</button>
             </form>
             <form v-if="!isAdminAuthority" @submit.prevent="handleAdminAuthority" class="flex flex-col p-6 gap-3">
                 <label class="label" for="adminauthpass">Password</label>
@@ -59,6 +67,7 @@
     </AuthLayout>
 </template>
 <script setup lang="ts">
+import { apiRequest } from '@/helpers';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { useToasterStore } from '@/stores';
 import { onMounted, ref, watch } from 'vue';
@@ -122,8 +131,21 @@ onMounted(async () => {
     isAdminAuthority.value = true
 })
 
-const createAdmin = async () => {
-    // const res = await fetch('')
+const createAdmin = async (e: Event) => {
+    try {
+        const form = e.currentTarget as HTMLFormElement
+        const formData = new FormData(form)
+        const body = Object.fromEntries(formData.entries())
+        const { res } = await apiRequest.post('/api/admin/create', body)
+        const result = await res.json()
+        if (result.error) {
+            throw new Error(result.message)
+        }
+        form.reset()
+        setToast("admin berhasil ditambahkan")
+    } catch (error) {
+        setToast((error as Error).message)
+    }
 }
 
 watch(isAdminAuthority, (newVal) => {

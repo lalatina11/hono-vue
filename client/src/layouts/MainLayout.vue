@@ -1,11 +1,11 @@
 <template>
     <div>
-        <Navbar />
+        <!-- <Navbar /> -->
         <slot />
     </div>
 </template>
 <script lang="ts" setup>
-import Navbar from "../components/Navbar.vue"
+// import Navbar from "../components/Navbar.vue"
 const props = defineProps<{ title: string }>()
 document.title = props.title
 </script>

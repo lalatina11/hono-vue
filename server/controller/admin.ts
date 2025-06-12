@@ -18,10 +18,10 @@ export const adminController = {
                 throw new Error("Semua field wajib diisi")
             }
             const password = hashSync(inputPassword, 12)
-            await db.insert(adminTable).values({ username, password, name })
+            await db.insert(adminTable).values({ username, name, password })
             return c.json({ message: "OK", error: false }, 201)
         } catch (error) {
-            return c.json({ message: (error as Error).message, error: true }, 201)
+            return c.json({ message: (error as Error).message, error: true }, 400)
 
         }
     },

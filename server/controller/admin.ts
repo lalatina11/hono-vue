@@ -38,6 +38,17 @@ export const adminController = {
 
         }
     },
+    logoutReqAdmin: async (c: Context) => {
+        await deleteCookie(c, "admin_permit")
+        return c.json({ message: "OK", error: false }, 200)
+    },
+    getAdminAuthority: async (c: Context) => {
+        const adminPermit = await getCookie(c, "admin_permit")
+        if (!adminPermit) {
+            return c.json({ message: "Need Permission", error: true }, 400)
+        }
+        return c.json({ message: "Ok Jalan", error: false }, 200)
+    },
     login: async (c: Context) => {
         try {
             const { username, password } = await c.req.json() as Admin

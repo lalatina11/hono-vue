@@ -1,11 +1,11 @@
 import { fileURLToPath, URL } from 'node:url'
-import * as dotenv from "dotenv"
-dotenv.config()
+import "dotenv/config";
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
+
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -19,12 +19,12 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
-  }, server: {
+  },
+  server: {
     proxy: {
       "/api": {
         target: process.env.VITE_API_KEY || "http://localhost:3000",
         changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/api/, '')
       }
     }
   }

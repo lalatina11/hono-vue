@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import MainLayout from '@/layouts/MainLayout.vue';
-
+import { useAdminStore } from '@/stores';
+import { storeToRefs } from 'pinia';
+const { admin } = storeToRefs(useAdminStore())
+if (!admin.value) {
+  location.replace("/auth?type=login")
+}
 </script>
 
 <template>

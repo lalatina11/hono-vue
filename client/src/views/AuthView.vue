@@ -88,16 +88,20 @@ const login = async (e: Event) => {
     try {
         const form = e.currentTarget as HTMLFormElement
         const formData = new FormData(form)
-        const body = Object.fromEntries(formData.entries())
-        const { res } = await apiRequest.post('/api/admin/login', body)
-        const result = await res.json()
-        if (result.error) {
-            throw new Error(result.message)
+        const body = Object.fromEntries(formData.entries()) as { username: string; password: string }
+        if (body.username.trim().length && body.password.trim().length) {
+            const { res } = await apiRequest.post('/api/admin/login', body)
+            const result = await res.json()
+            if (result.error) {
+                throw new Error(result.message)
+            }
+            setToast("Login berhasil")
+            setTimeout(() => {
+                nav.push('/')
+            }, 300);
+        } else {
+            throw new Error("isi form dengan baik dan benar!")
         }
-        setToast("Login berhasil")
-        setTimeout(() => {
-            nav.push('/')
-        }, 300);
     } catch (error) {
         setToast((error as Error).message)
     }
@@ -106,25 +110,32 @@ const login = async (e: Event) => {
 const handleAdminAuthority = async (e: Event) => {
     e.preventDefault()
     const form = e.currentTarget as HTMLFormElement
-
-    const res = await fetch("/api/admin/request-add", {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ password: new FormData(form).get("adminauthpass") })
-    })
-    if (!res.ok) {
+    try {
+        const password = new FormData(form).get("adminauthpass") as string
+        if (password.trim().length) {
+            const { res } = await apiRequest.post("/api/admin/request-add", { password })
+            const result = await res.json()
+            if (!res.ok || result.error) {
+                form.reset()
+                isAdminAuthority.value = false
+                throw new Error(result.message)
+            }
+            isAdminAuthority.value = true
+            setToast("Login sukses!")
+            form.reset()
+        } else {
+            throw new Error("isi password woi")
+        }
+    } catch (error) {
+        isAdminAuthority.value = false;
         form.reset()
-        return isAdminAuthority.value = false
+        setToast((error as Error).message)
     }
-    const result = await res.json()
-    if (result.error) {
-        form.reset()
-        return isAdminAuthority.value = false
-    }
-    isAdminAuthority.value = true
-    form.reset()
 }
 
 const handleLogoutAdminAuthority = async () => {
-    await fetch('/api/admin/request-add/logout', { method: "POST", credentials: "include", })
+    await apiRequest.post('/api/admin/request-add/logout')
+    setToast("Logout sukses!")
     isAdminAuthority.value = false
 }
 
@@ -157,7 +168,7 @@ onMounted(async () => {
 
 onMounted(async () => {
     await getAdmin()
-    const res = await fetch("/api/admin/request-add", { credentials: "include" })
+    const { res } = await apiRequest.get("/api/admin/request-add")
     if (!res.ok) {
         return isAdminAuthority.value = false
     }
@@ -172,14 +183,18 @@ const createAdmin = async (e: Event) => {
     try {
         const form = e.currentTarget as HTMLFormElement
         const formData = new FormData(form)
-        const body = Object.fromEntries(formData.entries())
-        const { res } = await apiRequest.post('/api/admin/create', body)
-        const result = await res.json()
-        if (result.error) {
-            throw new Error(result.message)
+        const body = Object.fromEntries(formData.entries()) as { username: string; name: string; password: string }
+        if (body.name.trim.length && body.username.trim().length && body.password.trim().length) {
+            const { res } = await apiRequest.post('/api/admin/create', body)
+            const result = await res.json()
+            if (result.error) {
+                throw new Error(result.message)
+            }
+            form.reset()
+            setToast("admin berhasil ditambahkan")
+        } else {
+            throw new Error("Isi form dengan baik dan benar bro!")
         }
-        form.reset()
-        setToast("admin berhasil ditambahkan")
     } catch (error) {
         setToast((error as Error).message)
     }

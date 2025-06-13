@@ -25,6 +25,9 @@ const getAdmin = async () => {
 
 onMounted(async () => {
   await getAdmin()
+  if (!admin.value) {
+    return location.replace("/auth?type=login")
+  }
 })
 
 watch(admin, () => {

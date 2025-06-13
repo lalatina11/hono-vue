@@ -11,12 +11,14 @@ export const adminTable = pgTable('admin', (t) => ({
     updatedAt: t.timestamp({ mode: "date" }).defaultNow().$onUpdate(() => new Date),
 }))
 
-export const expeditionsTable = pgTable('expeditions', () => ({
+export const expeditionsTable = pgTable('expeditions', (t) => ({
     id: integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
     resi: varchar('resi', { length: 255 }).notNull().unique().$defaultFn(() => createId()),
     adminId: uuid().notNull().references(() => adminTable.id),
     title: varchar().notNull(),
     desc: varchar().notNull(),
+    createdAt: t.timestamp({ mode: "date" }).defaultNow(),
+    updatedAt: t.timestamp({ mode: "date" }).defaultNow().$onUpdate(() => new Date),
 }))
 
 

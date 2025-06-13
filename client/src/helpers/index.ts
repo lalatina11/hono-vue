@@ -4,7 +4,7 @@ export const apiRequest = {
         return { res }
     },
     post: async (url: string, formBody?: any) => {
-        const res = await fetch(url, { method: "POST", credentials: "include", body: JSON.stringify(formBody) })
+        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(formBody) })
         return { res }
     }
 }

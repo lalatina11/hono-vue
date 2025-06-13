@@ -6,13 +6,15 @@
                     <label for="username" class="label">
                         <span class="label-text">Username</span>
                     </label>
-                    <input type="text" placeholder="username" id="username" class="input input-bordered" />
+                    <input type="text" placeholder="username" name="username" id="username"
+                        class="input input-bordered" />
                 </div>
                 <div class="form-control flex flex-col gap-2 w-full">
                     <label for="password" class="label">
                         <span class="label-text">Password</span>
                     </label>
-                    <input type="password" placeholder="password" id="password" class="input input-bordered" />
+                    <input type="password" name="password" placeholder="password" id="password"
+                        class="input input-bordered" />
                 </div>
                 <div class="form-control flex gap-2 items-center w-full my-2">
                     <input type="checkbox" onclick="password.type = password.type==='password'?'text':'password'"
@@ -69,17 +71,36 @@
 <script setup lang="ts">
 import { apiRequest } from '@/helpers';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-import { useToasterStore } from '@/stores';
+import { useAdminStore, useToasterStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 // const searchParams = new URLSearchParams(window.location.search);
 // console.log(searchParams.get("type"));
+const { setAdmin, removeAdmin } = useAdminStore()
+const { admin } = storeToRefs(useAdminStore())
+const nav = useRouter()
 const route = useRoute()
 const authType = ref("")
 const { setToast } = useToasterStore()
 const isAdminAuthority = ref(false)
-const login = () => {
-    setToast("Login")
+const login = async (e: Event) => {
+    try {
+        const form = e.currentTarget as HTMLFormElement
+        const formData = new FormData(form)
+        const body = Object.fromEntries(formData.entries())
+        const { res } = await apiRequest.post('/api/admin/login', body)
+        const result = await res.json()
+        if (result.error) {
+            throw new Error(result.message)
+        }
+        setToast("Login berhasil")
+        setTimeout(() => {
+            nav.push('/')
+        }, 300);
+    } catch (error) {
+        setToast((error as Error).message)
+    }
 }
 
 const handleAdminAuthority = async (e: Event) => {
@@ -107,8 +128,23 @@ const handleLogoutAdminAuthority = async () => {
     isAdminAuthority.value = false
 }
 
+const getAdmin = async () => {
+    const { res } = await apiRequest.get('/api/admin/current-admin')
+    if (!res.ok) {
+        return removeAdmin()
+    }
+    const result = await res.json()
+    if (result.error) {
+        return setToast(result.message)
+    }
 
-onMounted(() => {
+    if (!result.data) {
+        return removeAdmin()
+    }
+    setAdmin(result.data)
+}
+
+onMounted(async () => {
     const queryType = route.query.type as "login" | "create"
     if (queryType === 'create') {
         authType.value = 'create'
@@ -120,6 +156,7 @@ onMounted(() => {
 })
 
 onMounted(async () => {
+    await getAdmin()
     const res = await fetch("/api/admin/request-add", { credentials: "include" })
     if (!res.ok) {
         return isAdminAuthority.value = false
@@ -148,10 +185,17 @@ const createAdmin = async (e: Event) => {
     }
 }
 
+watch(admin, () => {
+    if (admin.value) {
+        return nav.push("/")
+    }
+})
+
 watch(isAdminAuthority, (newVal) => {
     if (newVal) {
         isAdminAuthority.value = newVal
     }
 })
+
 
 </script>

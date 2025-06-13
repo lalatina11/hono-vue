@@ -29,13 +29,12 @@ export const adminController = {
         try {
             const { password } = await c.req.json()
             if (password !== "candraganteng") {
-                return c.json({ message: "OK", error: false, invalidPassword: true }, 200)
+                return c.json({ message: "Password salah cok!", error: true, invalidPassword: true }, 400)
             }
             await setCookie(c, "admin_permit", "OK_Jalan", { path: "/", httpOnly: true, sameSite: "lax", maxAge: 60 * 60 * 24, secure: process.env.NODE_ENV === "production" })
             return c.json({ message: "OK", error: false }, 200)
         } catch (error) {
             return c.json({ message: (error as Error).message, error: true }, 400)
-
         }
     },
     logoutReqAdmin: async (c: Context) => {

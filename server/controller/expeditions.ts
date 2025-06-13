@@ -14,15 +14,19 @@ export const expeditionsController = {
                 throw new Error("Fill in the fields!")
             }
             const newExpedition = await db.insert(expeditionsTable).values({ adminId: adminId, desc, title }).returning()
-            return c.json(await newExpedition, { status: 201 })
+            return c.json({ data: newExpedition[0] }, { status: 201 })
         } catch (error) {
             return c.json({ error: (error as Error).message }, 400)
         }
     },
     update: async (c: Context) => {
         try {
+            const expId = await Number(c.req.query("id"))
+            if (!expId || typeof expId !== "number") {
+                throw new Error("Expedition ID are required!")
+            }
+
             const { title, desc } = await c.req.json() as Expeditions
-            const expId = await c.req.query("id")
             if (title.trim().length < 1 || desc.trim().length < 1) {
                 throw new Error("Fill in the fields!")
             }
@@ -46,9 +50,8 @@ export const expeditionsController = {
     },
     read: async (c: Context) => {
         try {
-            const expeditions = await db.select().from(expeditionsTable)
+            const expeditions = (await db.select().from(expeditionsTable)).sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0))
             return c.json({ data: expeditions }, { status: 201 })
-
         } catch (error) {
             return c.json({ error: (error as Error).message }, 400)
         }
@@ -70,7 +73,7 @@ export const expeditionsController = {
     },
     getExpById: async (c: Context) => {
         try {
-            const id = await c.req.query("id")
+            const id = await Number(c.req.query("id"))
             if (!id || typeof id !== "number") {
                 throw new Error("Expedition ID are required!")
             }

@@ -2,8 +2,9 @@
 import { apiRequest } from "@/helpers";
 import MainLayout from '@/layouts/MainLayout.vue';
 import { useAdminStore, useToasterStore } from '@/stores';
+import type { Expeditions } from "@/types";
 import { storeToRefs } from 'pinia';
-import { onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 const { admin } = storeToRefs(useAdminStore())
 const { setAdmin, removeAdmin } = useAdminStore()
 const { setToast } = useToasterStore()
@@ -23,11 +24,16 @@ const getAdmin = async () => {
   setAdmin(result.data)
 }
 
+const expeditions = ref<Expeditions[]>([])
+
 onMounted(async () => {
   await getAdmin()
   if (!admin.value) {
     return location.replace("/auth?type=login")
   }
+  const { res } = await apiRequest.get("/api/exp")
+  const result = await res.json()
+  expeditions.value = result.data
 })
 
 watch(admin, () => {
@@ -45,15 +51,68 @@ const handleLogout = async () => {
     setToast((error as Error).message)
   }
 }
+const handleAddExp = async (e: Event) => {
+  e.preventDefault()
+  const form = e.currentTarget as HTMLFormElement
+  try {
+    const formData = new FormData(form)
+    const body = Object.fromEntries(formData.entries()) as { title: string; desc: string }
+    if (body.desc.trim().length && body.title.length) {
+      const { res } = await apiRequest.post("/api/exp", body)
+      const result = await res.json()
+      if (!res.ok || result.error) {
+        throw new Error(result.message || "Something went wrong")
+      }
+      expeditions.value = [result.data, ...expeditions.value]
+      form.reset()
+    } else {
+      throw new Error("isi form yang bener woi")
+    }
+  } catch (error) {
+    setToast((error as Error).message)
+    form.reset()
+  }
+}
+
 </script>
 
 <template>
   <MainLayout title="iExpress | Home">
-    <main>
+    <main class="flex flex-col gap-2">
       <h1>{{ admin?.username }}</h1>
-      <form @submit.prevent="handleLogout">
-        <button class="btn btn-error">Logout</button>
-      </form>
+      <div class="flex gap-2 items-center">
+        <form @submit.prevent="handleLogout">
+          <button class="btn btn-error">Logout</button>
+        </form>
+        <button class="btn btn-primary" onclick="addExpModal.showModal()">Add new Expedition</button>
+        <dialog id="addExpModal" class="modal space-y-6">
+          <div class="modal-box">
+            <h3 class="text-lg font-bold">Add new Expedition!</h3>
+            <form @submit.prevent="handleAddExp" class="space-y-6">
+              <div class="flex flex-col gap-3">
+                <label class="label floating-label" for="title">Title</label>
+                <input class="input input-secondary" type="text" name="title" id="title">
+              </div>
+              <div class="flex flex-col gap-3">
+                <label class="label floating-label" for="desc">Title</label>
+                <input class="input input-secondary" type="text" name="desc" id="desc">
+              </div>
+              <div class="flex gap-3 justify-between items-center">
+                <button type="button" onclick="addExpModal.close()" class="btn">Close</button>
+                <button type="submit" onclick="addExpModal.close()" class="btn btn-secondary">Submit</button>
+              </div>
+            </form>
+          </div>
+        </dialog>
+      </div>
+      <section v-if="expeditions.length" class="grid grid-cols-5">
+        <div v-for="exp in expeditions" :key="exp.id" class="flex flex-col gap-3">
+          <span>
+            {{ exp.title }}
+          </span>
+        </div>
+      </section>
+      <span v-if="!expeditions.length">Belum ada expedisi</span>
     </main>
   </MainLayout>
 </template>

@@ -20,7 +20,7 @@ watch(toastMessage, (newVal) => {
     if (newVal) {
         setTimeout(() => {
             clearToast()
-        }, 3000);
+        }, 5000);
     }
 })
 

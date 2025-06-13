@@ -51,6 +51,9 @@ export const adminController = {
     },
     login: async (c: Context) => {
         try {
+            if (await getCookie(c, "admin_permit")) {
+                deleteCookie(c, "admin_permit")
+            }
             const { username, password } = await c.req.json() as Admin
             const existingAdmin = await db.select().from(adminTable).where(eq(adminTable.username, username))
             if (!existingAdmin.length) throw new Error("Admin does not exist")
@@ -59,7 +62,7 @@ export const adminController = {
             if (!validPassword) throw new Error("Password tidak valid")
             const token = jwt.sign({ id: existingAdmin[0].id }, process.env.SECRET_KEY || "", { expiresIn: "1w" })
             await setCookie(c, "admin_token", token, { path: "/", httpOnly: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 7, secure: process.env.NODE_ENV === "production" })
-            return c.json({ message: "OK", error: true }, 400)
+            return c.json({ message: "OK", error: false }, 200)
         } catch (error) {
             return c.json({ message: (error as Error).message, error: true }, 400)
         }

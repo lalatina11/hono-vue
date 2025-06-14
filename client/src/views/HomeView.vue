@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Expeditions from "@/components/Expeditions.vue";
+import { handleLogoutAdminExp } from "@/components/libs";
 import { apiRequest } from "@/helpers";
 import MainLayout from '@/layouts/MainLayout.vue';
 import { useAdminStore, useToasterStore, type AdminType } from '@/stores';
@@ -13,7 +14,7 @@ const getAdmin = async () => {
   const { res } = await apiRequest.get('/api/admin/current-admin')
   if (!res.ok) {
     removeAdmin()
-    return handleLogout()
+    return handleLogoutAdminExp()
   }
   const result = await res.json()
   return result.data as AdminType
@@ -26,16 +27,6 @@ if (!adminData) {
   setAdmin(adminData.value as AdminType)
 }
 
-const handleLogout = async () => {
-  try {
-    await apiRequest.post("/api/admin/logout")
-    removeAdmin()
-    setToast("Logout berhasil")
-    location.replace("/auth?type=login")
-  } catch (error) {
-    setToast((error as Error).message)
-  }
-}
 watch(adminData, (newVal) => {
   if (newVal) {
     setAdmin(adminData.value as AdminType)
@@ -56,11 +47,6 @@ watch(isFetchAdminError, (newVal) => {
   <MainLayout title="iExpress | Home">
     <main class="flex flex-col gap-6">
       <h1>{{ admin?.username }}</h1>
-      <section>
-        <form @submit.prevent="handleLogout">
-          <button class="btn btn-error">Logout</button>
-        </form>
-      </section>
       <Expeditions />
     </main>
   </MainLayout>

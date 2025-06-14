@@ -18,7 +18,7 @@ const router = createRouter({
     },
     {
       path: "/exp/:id",
-      name: "auth",
+      name: "singleExp",
       component: SingleExpeditionView
     }
   ],

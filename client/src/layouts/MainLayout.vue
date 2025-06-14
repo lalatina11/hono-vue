@@ -1,11 +1,13 @@
 <template>
     <div>
-        <!-- <Navbar /> -->
+        <main>
+            <NavDropDown />
+        </main>
         <slot />
     </div>
 </template>
 <script lang="ts" setup>
-// import Navbar from "../components/Navbar.vue"
+import NavDropDown from "@/components/NavDropDown.vue"
 const props = defineProps<{ title: string }>()
 document.title = props.title
 </script>

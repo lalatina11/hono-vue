@@ -11,6 +11,10 @@ const { setAdmin, removeAdmin } = useAdminStore()
 const { setToast } = useToasterStore()
 const getAdmin = async () => {
   const { res } = await apiRequest.get('/api/admin/current-admin')
+  if (!res.ok) {
+    removeAdmin()
+    return handleLogout()
+  }
   const result = await res.json()
   return result.data as AdminType
 }
@@ -41,7 +45,7 @@ watch(adminData, (newVal) => {
   }
 })
 watch(isFetchAdminError, (newVal) => {
-  if (newVal && !admin.value) {
+  if (newVal && !admin.value || isFetchAdminError) {
     removeAdmin()
     return location.replace("/auth?type=login")
   }

@@ -72,8 +72,8 @@ const handleAddExp = async (e: Event) => {
             </div>
         </dialog>
     </section>
-    <section v-if="expeditonFetchPending" class="grid grid-cols-3 gap-4">
-        <div v-for="i in 9" :key="i" class="card w-96 bg-base-100 card-lg shadow-sm shadow-zinc-500">
+    <section v-if="expeditonFetchPending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div v-for="i in 9" :key="i" class="card max-w-sm bg-base-100 card-lg shadow-sm shadow-zinc-500">
             <div class="card-body">
                 <span class="card-title bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
                 <span class="bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
@@ -83,8 +83,8 @@ const handleAddExp = async (e: Event) => {
             </div>
         </div>
     </section>
-    <section v-if="expeditions.length" class="grid grid-cols-3 gap-4">
-        <div v-for="exp in expeditions" :key="exp.id" class="card w-96 bg-base-100 card-lg shadow-sm shadow-zinc-500">
+    <section v-if="expeditions.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div v-for="exp in expeditions" :key="exp.id" class="card max-w-sm bg-base-100 card-lg shadow-sm shadow-zinc-500">
             <div class="card-body">
                 <span class="card-title">Judul expedisi: {{ exp.title }}</span>
                 <span>Deskripsi expedisi: {{ exp.desc }}</span>

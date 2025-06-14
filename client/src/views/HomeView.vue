@@ -24,16 +24,33 @@ const getAdmin = async () => {
   setAdmin(result.data)
 }
 
+const getExpeditionsData = async () => {
+  expeditionRenderState.value.isLoading = true
+  // setTimeout(async () => {
+  expeditionRenderState.value.isLoading = true
+  const { res } = await apiRequest.get("/api/exp")
+  const result = await res.json()
+  if (!res.ok || result.error) {
+    expeditionRenderState.value.isLoading = false
+    expeditionRenderState.value.isError.error = true
+    expeditionRenderState.value.isError.message = result.message || "Something Went Wrong"
+    return
+  }
+  expeditionRenderState.value.isError.error = false
+  expeditionRenderState.value.isLoading = false
+  expeditions.value = result.data
+  // }, 1500);
+}
+
 const expeditions = ref<Expeditions[]>([])
+const expeditionRenderState = ref({ isLoading: false, isError: { error: false, message: "" }, isRendered: true })
 
 onMounted(async () => {
   await getAdmin()
   if (!admin.value) {
     return location.replace("/auth?type=login")
   }
-  const { res } = await apiRequest.get("/api/exp")
-  const result = await res.json()
-  expeditions.value = result.data
+  await getExpeditionsData()
 })
 
 watch(admin, () => {
@@ -64,6 +81,7 @@ const handleAddExp = async (e: Event) => {
         throw new Error(result.message || "Something went wrong")
       }
       expeditions.value = [result.data, ...expeditions.value]
+      setToast("Expedisi berhasil ditambahkan!")
       form.reset()
     } else {
       throw new Error("isi form yang bener woi")
@@ -78,9 +96,9 @@ const handleAddExp = async (e: Event) => {
 
 <template>
   <MainLayout title="iExpress | Home">
-    <main class="flex flex-col gap-2">
+    <main class="flex flex-col gap-6">
       <h1>{{ admin?.username }}</h1>
-      <div class="flex gap-2 items-center">
+      <section class="flex gap-2 items-center">
         <form @submit.prevent="handleLogout">
           <button class="btn btn-error">Logout</button>
         </form>
@@ -94,7 +112,7 @@ const handleAddExp = async (e: Event) => {
                 <input class="input input-secondary" type="text" name="title" id="title">
               </div>
               <div class="flex flex-col gap-3">
-                <label class="label floating-label" for="desc">Title</label>
+                <label class="label floating-label" for="desc">Desc</label>
                 <input class="input input-secondary" type="text" name="desc" id="desc">
               </div>
               <div class="flex gap-3 justify-between items-center">
@@ -104,15 +122,31 @@ const handleAddExp = async (e: Event) => {
             </form>
           </div>
         </dialog>
-      </div>
-      <section v-if="expeditions.length" class="grid grid-cols-5">
-        <div v-for="exp in expeditions" :key="exp.id" class="flex flex-col gap-3">
-          <span>
-            {{ exp.title }}
-          </span>
+      </section>
+      <section id="sceleton" v-if="expeditionRenderState.isLoading && !expeditionRenderState.isError.error"
+        class="grid grid-cols-3 gap-4">
+        <div v-for="i in 9" :key="i" class="card w-96 bg-base-100 card-lg shadow-sm shadow-zinc-500">
+          <div class="card-body">
+            <span class="card-title bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
+            <span class="bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
+            <span class="bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
+            <span class="bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
+            <span class="bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
+          </div>
         </div>
       </section>
-      <span v-if="!expeditions.length">Belum ada expedisi</span>
+      <section v-if="expeditions.length" class="grid grid-cols-3 gap-4">
+        <div v-for="exp in expeditions" :key="exp.id" class="card w-96 bg-base-100 card-lg shadow-sm shadow-zinc-500">
+          <div class="card-body">
+            <span class="card-title">{{ exp.title }}</span>
+            <span>{{ exp.desc }}</span>
+            <span>{{ exp.resi }}</span>
+          </div>
+        </div>
+      </section>
+      <span v-if="expeditionRenderState.isError.error && !expeditionRenderState.isLoading">{{
+        expeditionRenderState.isError.message }}</span>
+      <span v-if="!expeditions.length && !expeditionRenderState.isLoading">Belum ada expedisi</span>
     </main>
   </MainLayout>
 </template>

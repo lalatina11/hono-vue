@@ -3,6 +3,7 @@ import { apiRequest } from "@/helpers";
 import MainLayout from '@/layouts/MainLayout.vue';
 import { useAdminStore, useToasterStore } from '@/stores';
 import type { Expeditions } from "@/types";
+import { useQuery } from "@tanstack/vue-query";
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 const { admin } = storeToRefs(useAdminStore())
@@ -24,39 +25,31 @@ const getAdmin = async () => {
   setAdmin(result.data)
 }
 
-const getExpeditionsData = async () => {
-  expeditionRenderState.value.isLoading = true
-  // setTimeout(async () => {
-  expeditionRenderState.value.isLoading = true
-  const { res } = await apiRequest.get("/api/exp")
-  const result = await res.json()
-  if (!res.ok || result.error) {
-    expeditionRenderState.value.isLoading = false
-    expeditionRenderState.value.isError.error = true
-    expeditionRenderState.value.isError.message = result.message || "Something Went Wrong"
-    return
-  }
-  expeditionRenderState.value.isError.error = false
-  expeditionRenderState.value.isLoading = false
-  expeditions.value = result.data
-  // }, 1500);
-}
-
-const expeditions = ref<Expeditions[]>([])
-const expeditionRenderState = ref({ isLoading: false, isError: { error: false, message: "" }, isRendered: true })
-
 onMounted(async () => {
   await getAdmin()
   if (!admin.value) {
     return location.replace("/auth?type=login")
   }
-  await getExpeditionsData()
 })
+
+const { isPending: expeditonFetchPending, isError: expeditionFetchIsError, data: expeditionsData, error: expeditionsFetchError } = useQuery({
+  queryKey: ['expeditions'],
+  queryFn: async () => {
+    const { res } = await apiRequest.get("/api/exp")
+    const result = await res.json()
+    return result.data as Expeditions[]
+  },
+})
+
+const expeditions = ref<Expeditions[]>(expeditionsData.value ?? [])
 
 watch(admin, () => {
   if (!admin.value) {
     return location.replace("/auth?type=login")
   }
+})
+watch(expeditionsData, (newVal) => {
+  expeditions.value = newVal ?? []
 })
 const handleLogout = async () => {
   try {
@@ -91,7 +84,6 @@ const handleAddExp = async (e: Event) => {
     form.reset()
   }
 }
-
 </script>
 
 <template>
@@ -123,8 +115,7 @@ const handleAddExp = async (e: Event) => {
           </div>
         </dialog>
       </section>
-      <section id="sceleton" v-if="expeditionRenderState.isLoading && !expeditionRenderState.isError.error"
-        class="grid grid-cols-3 gap-4">
+      <section v-if="expeditonFetchPending" class="grid grid-cols-3 gap-4">
         <div v-for="i in 9" :key="i" class="card w-96 bg-base-100 card-lg shadow-sm shadow-zinc-500">
           <div class="card-body">
             <span class="card-title bg-zinc-500 filter blur-6px w-full h-3 rounded-md"></span>
@@ -144,9 +135,9 @@ const handleAddExp = async (e: Event) => {
           </div>
         </div>
       </section>
-      <span v-if="expeditionRenderState.isError.error && !expeditionRenderState.isLoading">{{
-        expeditionRenderState.isError.message }}</span>
-      <span v-if="!expeditions.length && !expeditionRenderState.isLoading">Belum ada expedisi</span>
+      <span v-if="expeditionFetchIsError">{{
+        expeditionsFetchError?.message }}</span>
+      <span v-if="!expeditions.length">Belum ada expedisi</span>
     </main>
   </MainLayout>
 </template>

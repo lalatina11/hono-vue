@@ -1,6 +1,7 @@
 import AuthView from '@/views/AuthView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import SingleExpeditionView from '@/views/SingleExpeditionView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: "/auth",
       name: "auth",
       component: AuthView
+    },
+    {
+      path: "/exp/:id",
+      name: "auth",
+      component: SingleExpeditionView
     }
   ],
 })

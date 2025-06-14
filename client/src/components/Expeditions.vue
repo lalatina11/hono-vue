@@ -45,12 +45,9 @@ const handleAddExp = async (e: Event) => {
         form.reset()
     }
 }
-
-
 </script>
 <template>
     <section class="flex gap-2 items-center">
-
         <button class="btn btn-primary" onclick="addExpModal.showModal()">Add new Expedition</button>
         <dialog id="addExpModal" class="modal space-y-6">
             <div class="modal-box">
@@ -83,16 +80,17 @@ const handleAddExp = async (e: Event) => {
             </div>
         </div>
     </section>
-    <section v-if="expeditions.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="exp in expeditions" :key="exp.id" class="card max-w-sm bg-base-100 card-lg shadow-sm shadow-zinc-500">
+    <section v-if="expeditions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <RouterLink :to="`/exp/${exp.id}`" v-for="exp in expeditions" :key="exp.id"
+            class="card max-w-sm bg-base-100 card-lg shadow-sm shadow-zinc-500">
             <div class="card-body">
                 <span class="card-title">Judul expedisi: {{ exp.title }}</span>
                 <span>Deskripsi expedisi: {{ exp.desc }}</span>
                 <span>No Resi: {{ exp.resi }}</span>
             </div>
-        </div>
+        </RouterLink>
     </section>
     <span v-if="expeditionFetchIsError">{{
         expeditionsFetchError?.message }}</span>
-    <span v-if="!expeditions.length">Belum ada expedisi</span>
+    <span v-if="!expeditions?.values.length">Belum ada expedisi</span>
 </template>

@@ -5,7 +5,7 @@ const router = new Hono()
 
 router.post("/", expeditionsController.create)
 router.get("/", expeditionsController.read)
-router.get("/", expeditionsController.getExpById)
+router.get("/single", expeditionsController.getExpById)
 router.post("/update", expeditionsController.update)
 router.post("/delete", expeditionsController.delete)
 

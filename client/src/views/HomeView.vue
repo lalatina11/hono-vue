@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Expeditions from "@/components/Expeditions.vue";
-import { handleLogoutAdminExp } from "@/components/libs";
+import { handleLogoutAdminExp } from "@/libs";
 import { apiRequest } from "@/helpers";
 import MainLayout from '@/layouts/MainLayout.vue';
 import { useAdminStore, useToasterStore, type AdminType } from '@/stores';

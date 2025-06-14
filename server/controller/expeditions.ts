@@ -43,7 +43,8 @@ export const expeditionsController = {
             })
                 .where(eq(expeditionsTable.id, +expId))
                 .returning()
-            return c.json({ data: updatedExpedition }, { status: 201 })
+            const data = updatedExpedition[0]
+            return c.json({ data }, { status: 201 })
         } catch (error) {
             return c.json({ error: (error as Error).message }, 400)
         }
